@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星空宝盒 - Demo Day 演示版</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap');
+        
+        :root{
+            --night-sky:#0c0c1d;
+            --star-color:#ffffff;
+            --glow-color:rgba(255,255,255,0.7);
+            --text-color:#e0e0e0;
+            --accent-color:#f0a5a5;
+        }
+        
+        body{
+            margin:0;
+            padding:0;
+            background: linear-gradient(135deg, #0c0c1d 0%, #1a1a2e 50%, #16213e 100%) !important;
+            color:var(--text-color);
+            font-family:'Noto Serif SC',serif;
+            overflow:hidden;
+            min-height: 100vh;
+            width: 100%;
+            height: 100%;
+        }
+        
+        html {
+            background: linear-gradient(135deg, #0c0c1d 0%, #1a1a2e 50%, #16213e 100%);
+            height: 100%;
+            width: 100%;
+        }
+        
+
+        
+        #login-screen{
+            display:flex;
+            flex-direction:column;
+            justify-content:center;
+            align-items:center;
+            height:100vh;
+            text-align:center;
+            transition:all 1s ease-out;
+            background: transparent;
+            backdrop-filter: blur(5px);
+        }
+        
+        #login-screen.fade-out {
+            opacity: 0;
+            transform: translateY(-50px);
+        }
+        
+        #login-screen h1{
+            font-family:'ZCOOL KuaiLe',cursive;
+            font-size:4em;
+            color:white;
+            text-shadow:0 0 20px var(--glow-color);
+            margin-bottom: 0.5em;
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+        
+        @keyframes titleGlow {
+            from { text-shadow: 0 0 20px var(--glow-color); }
+            to { text-shadow: 0 0 30px var(--glow-color), 0 0 40px rgba(255, 255, 255, 0.5); }
+        }
+        
+        #login-screen p {
+            font-size: 1.2em;
+            margin-bottom: 2em;
+            opacity: 0.9;
+        }
+        
+        #login-screen input{
+            padding:15px 25px;
+            font-size:1.1em;
+            border-radius:25px;
+            border:2px solid var(--accent-color);
+            background:rgba(255,255,255,0.1);
+            color:white;
+            text-align:center;
+            margin:20px 0;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+        
+        #login-screen input:focus {
+            outline: none;
+            border-color: #fff;
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+        
+        #login-screen button{
+            padding:15px 40px;
+            font-size:1.2em;
+            font-family:'ZCOOL KuaiLe',cursive;
+            border:none;
+            border-radius:25px;
+            background: linear-gradient(45deg, var(--accent-color), #ff6b6b);
+            color:white;
+            cursor:pointer;
+            transition:all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(240, 165, 165, 0.3);
+        }
+        
+        #login-screen button:hover{
+            transform:translateY(-2px);
+            box-shadow: 0 8px 25px rgba(240, 165, 165, 0.5);
+        }
+        
+
+        
+        #gallery{
+            position:absolute;
+            top:0;
+            left:0;
+            width:100vw;
+            height:100vh;
+            opacity:0;
+            visibility:hidden;
+            transition:all 1s ease-in;
+        }
+        
+        #gallery.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* 动态星空背景 */
+        .stars-bg{
+            position:absolute;
+            width:100%;
+            height:100%;
+            background:transparent;
+            background-image:
+                radial-gradient(white,rgba(255,255,255,.2) 2px,transparent 40px),
+                radial-gradient(white,rgba(255,255,255,.15) 1px,transparent 30px),
+                radial-gradient(white,rgba(255,255,255,.1) 2px,transparent 40px),
+                radial-gradient(rgba(255,255,255,.4),rgba(255,255,255,.1) 2px,transparent 30px);
+            background-size:550px 550px,350px 350px,250px 250px,150px 150px;
+            background-position:0 0,40px 60px,130px 270px,70px 100px;
+            animation:starsTwinkle 8s infinite linear;
+        }
+        
+        @keyframes starsTwinkle {
+            0% { transform: scale(1) rotate(0deg); opacity: 0.8; }
+            25% { transform: scale(1.05) rotate(90deg); opacity: 1; }
+            50% { transform: scale(1) rotate(180deg); opacity: 0.9; }
+            75% { transform: scale(1.05) rotate(270deg); opacity: 1; }
+            100% { transform: scale(1) rotate(360deg); opacity: 0.8; }
+        }
+        
+        /* NFT星星优化 */
+        .star{
+            position:absolute;
+            width:16px;
+            height:16px;
+            background: radial-gradient(circle, #fff 0%, #f0a5a5 70%, transparent 100%);
+            border-radius:50%;
+            cursor:pointer;
+            animation:starPulse 3s infinite ease-in-out;
+            transition:all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 
+                0 0 10px rgba(255, 255, 255, 0.8),
+                0 0 20px rgba(240, 165, 165, 0.6),
+                0 0 30px rgba(240, 165, 165, 0.4);
+        }
+        
+        .star:hover{
+            transform:scale(1.8) rotate(360deg);
+            animation-play-state: paused;
+            box-shadow: 
+                0 0 20px rgba(255, 255, 255, 1),
+                0 0 40px rgba(240, 165, 165, 0.8),
+                0 0 60px rgba(240, 165, 165, 0.6);
+        }
+        
+        @keyframes starPulse {
+            0%, 100% { 
+                transform: scale(1); 
+                opacity: 0.8; 
+            }
+            50% { 
+                transform: scale(1.2); 
+                opacity: 1; 
+            }
+        }
+        
+        /* 不同大小的星星 */
+        .star.large {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .star.small {
+            width: 12px;
+            height: 12px;
+        }
+        
+        /* 特殊颜色的星星 */
+        .star.golden {
+            background: radial-gradient(circle, #ffd700 0%, #ffb347 70%, transparent 100%);
+            box-shadow: 
+                0 0 10px rgba(255, 215, 0, 0.8),
+                0 0 20px rgba(255, 179, 71, 0.6),
+                0 0 30px rgba(255, 179, 71, 0.4);
+        }
+        
+        .star.blue {
+            background: radial-gradient(circle, #87ceeb 0%, #4169e1 70%, transparent 100%);
+            box-shadow: 
+                0 0 10px rgba(135, 206, 235, 0.8),
+                0 0 20px rgba(65, 105, 225, 0.6),
+                0 0 30px rgba(65, 105, 225, 0.4);
+        }
+        
+        .star.pink {
+            background: radial-gradient(circle, #ffc0cb 0%, #ff69b4 70%, transparent 100%);
+            box-shadow: 
+                0 0 10px rgba(255, 192, 203, 0.8),
+                0 0 20px rgba(255, 105, 180, 0.6),
+                0 0 30px rgba(255, 105, 180, 0.4);
+        }
+        
+        /* 星星出现动画 */
+        @keyframes starAppear {
+            0% {
+                transform: scale(0) rotate(0deg);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.5) rotate(180deg);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(1) rotate(360deg);
+                opacity: 1;
+            }
+        }
+        
+        .star.appearing {
+            animation: starAppear 0.8s ease-out forwards;
+        }
+        
+        /* 信件查看器 */
+        #letter-viewer{
+            position:fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            background:rgba(0,0,0,0.3);
+            backdrop-filter: blur(5px);
+            display:none;
+            justify-content:center;
+            align-items:center;
+            z-index:1000;
+        }
+        
+        #letter-viewer.active {
+            display: flex;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        #letter-viewer img{
+            max-width:85%;
+            max-height:85%;
+            border-radius:15px;
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 
+                0 0 30px rgba(255, 255, 255, 0.8),
+                0 0 60px rgba(240, 165, 165, 0.6),
+                0 0 100px rgba(240, 165, 165, 0.4),
+                0 10px 30px rgba(0, 0, 0, 0.5);
+            animation: imageZoom 0.5s ease-out;
+        }
+        
+        @keyframes imageZoom {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        #close-viewer{
+            position:absolute;
+            top:30px;
+            right:40px;
+            font-size:3em;
+            color:white;
+            cursor:pointer;
+            transition:all 0.3s ease;
+            text-shadow: 
+                0 0 15px rgba(255, 255, 255, 0.9),
+                0 0 25px rgba(240, 165, 165, 0.7),
+                0 0 35px rgba(240, 165, 165, 0.5);
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        #close-viewer:hover{
+            transform:rotate(90deg) scale(1.1);
+            color:var(--accent-color);
+            background: rgba(240, 165, 165, 0.2);
+            text-shadow: 
+                0 0 20px rgba(255, 255, 255, 1),
+                0 0 30px rgba(240, 165, 165, 0.9),
+                0 0 40px rgba(240, 165, 165, 0.7);
+        }
+        
+        /* 加载指示器 */
+        #loading-indicator{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            display: none;
+        }
+        
+        #loading-indicator.active {
+            display: block;
+        }
+        
+        .loading-text {
+            font-size: 1.5em;
+            text-shadow: 0 0 15px var(--glow-color);
+            animation: loadingPulse 2s infinite ease-in-out;
+            margin: 10px 0;
+        }
+        
+        @keyframes loadingPulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+        
+        .loading-spinner {
+            margin: 20px auto;
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* 统计信息 */
+        #stats {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        #stats.active {
+            opacity: 1;
+        }
+        
+        #stats div {
+            margin: 5px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            #login-screen h1 {
+                font-size: 2.5em;
+            }
+            
+            #login-screen input,
+            #login-screen button {
+                width: 80%;
+                max-width: 300px;
+            }
+            
+            .star {
+                width: 12px;
+                height: 12px;
+            }
+            
+            #letter-viewer img {
+                max-width: 95%;
+                max-height: 95%;
+            }
+            
+            #stats {
+                font-size: 0.8em;
+                padding: 10px;
+            }
+        }
+        
+        /* 浮动粒子效果 */
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 4s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { 
+                transform: translateY(0px); 
+                opacity: 0.3; 
+            }
+            50% { 
+                transform: translateY(-20px); 
+                opacity: 0.7; 
+            }
+        }
+        
+        /* 背景装饰星星 */
+        .bg-star {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: bgStarTwinkle 4s ease-in-out infinite;
+        }
+        
+        .bg-star.tiny {
+            width: 2px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 4px rgba(255, 255, 255, 0.4);
+        }
+        
+        .bg-star.small {
+            width: 3px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+        }
+        
+        .bg-star.medium {
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+        }
+        
+        .bg-star.bright {
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+        }
+        
+        @keyframes bgStarTwinkle {
+            0%, 100% { 
+                opacity: 0.3;
+                transform: scale(1);
+            }
+            25% { 
+                opacity: 0.8;
+                transform: scale(1.1);
+            }
+            50% { 
+                opacity: 0.5;
+                transform: scale(1);
+            }
+            75% { 
+                opacity: 0.9;
+                transform: scale(1.2);
+            }
+        }
+        
+        /* 可点击星星增强效果 */
+        .star.clickable {
+            z-index: 100;
+            position: relative;
+            animation: clickableStarPulse 3s infinite ease-in-out;
+        }
+        
+        /* 真实NFT星星特殊效果 */
+        .star.real-nft {
+            z-index: 200;
+            position: relative;
+            animation: realNftPulse 2s infinite ease-in-out;
+            width: 24px !important;
+            height: 24px !important;
+        }
+        
+        @keyframes clickableStarPulse {
+            0%, 100% { 
+                transform: scale(1); 
+                opacity: 0.9;
+                box-shadow: 
+                    0 0 10px rgba(255, 255, 255, 0.8),
+                    0 0 20px rgba(240, 165, 165, 0.6),
+                    0 0 30px rgba(240, 165, 165, 0.4);
+            }
+            50% { 
+                transform: scale(1.15); 
+                opacity: 1;
+                box-shadow: 
+                    0 0 15px rgba(255, 255, 255, 1),
+                    0 0 30px rgba(240, 165, 165, 0.8),
+                    0 0 45px rgba(240, 165, 165, 0.6);
+            }
+        }
+        
+        @keyframes realNftPulse {
+            0%, 100% { 
+                transform: scale(1); 
+                opacity: 0.95;
+                box-shadow: 
+                    0 0 15px rgba(255, 215, 0, 1),
+                    0 0 30px rgba(255, 215, 0, 0.8),
+                    0 0 45px rgba(255, 215, 0, 0.6),
+                    0 0 60px rgba(255, 215, 0, 0.4);
+            }
+            50% { 
+                transform: scale(1.3); 
+                opacity: 1;
+                box-shadow: 
+                    0 0 20px rgba(255, 215, 0, 1),
+                    0 0 40px rgba(255, 215, 0, 0.9),
+                    0 0 60px rgba(255, 215, 0, 0.7),
+                    0 0 80px rgba(255, 215, 0, 0.5);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="login-screen">
+        <h1>星空宝盒</h1>
+        <p>输入密语，点亮只属于你的星空</p>
+        <input type="password" id="password-input" placeholder="● ● ● ●">
+        <button id="login-button">开启星空之旅</button>
+    </div>
+
+    <div id="gallery">
+        <div class="stars-bg"></div>
+        <div id="stats">
+            <div>💫 已发现星星：<span id="star-count">0</span> 颗</div>
+            <div>🌟 真实NFT：<span id="real-nft-count">0</span> 个</div>
+            <div>📮 珍贵回忆：<span id="memory-count">0</span> 份</div>
+            <div>✨ 星空亮度：<span id="brightness">0</span>%</div>
+        </div>
+        <div id="loading-indicator">
+            <div class="loading-text">正在为你摘取星星...</div>
+            <div class="loading-text">每一颗星都是一份珍贵的回忆</div>
+            <div class="loading-spinner"></div>
+        </div>
+    </div>
+
+    <div id="letter-viewer">
+        <span id="close-viewer">&times;</span>
+        <img id="letter-image" src="" alt="信件内容">
+    </div>
+
+    <script src="./ethers.umd.min.js"></script>
+    <script src="./config.js"></script>
+    <script>
+        // 演示模式数据
+        const demoMode = true;
+        const demoStars = [
+            // 真实NFT将动态添加
+        
+            {
+                id: 1,
+                title: "第一封信",
+                content: "来自志愿者的第一封信，充满了温暖的鼓励...",
+                image: "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
+                    <svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="100%" height="100%" fill="#f0f8ff"/>
+                        <text x="50%" y="35%" font-family="Arial, sans-serif" font-size="24" fill="#333333" text-anchor="middle" font-weight="bold">
+                            ✨ 第一封信
+                        </text>
+                        <text x="50%" y="55%" font-family="Arial, sans-serif" font-size="16" fill="#666666" text-anchor="middle">
+                            亲爱的朋友，
+                        </text>
+                        <text x="50%" y="70%" font-family="Arial, sans-serif" font-size="14" fill="#666666" text-anchor="middle">
+                            愿你正在为自己沉淀着路上的温暖与希望，
+                        </text>
+                        <text x="50%" y="85%" font-family="Arial, sans-serif" font-size="14" fill="#666666" text-anchor="middle">
+                            写了这封信。
+                        </text>
+                    </svg>
+                `),
+                position: { top: "25%", left: "15%" },
+                size: "large",
+                color: "golden"
+            },
+            {
+                id: 2,
+                title: "生日祝福",
+                content: "特别的生日祝福，让这个日子更加难忘...",
+                image: "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
+                    <svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="100%" height="100%" fill="#fff5ee"/>
+                        <text x="50%" y="35%" font-family="Arial, sans-serif" font-size="24" fill="#333333" text-anchor="middle" font-weight="bold">
+                            🎂 生日快乐
+                        </text>
+                        <text x="50%" y="55%" font-family="Arial, sans-serif" font-size="16" fill="#666666" text-anchor="middle">
+                            想在这个特殊的日子里，
+                        </text>
+                        <text x="50%" y="70%" font-family="Arial, sans-serif" font-size="14" fill="#666666" text-anchor="middle">
+                            为你送上一份独特的祝福和惊喜！
+                        </text>
+                        <text x="50%" y="85%" font-family="Arial, sans-serif" font-size="14" fill="#666666" text-anchor="middle">
+                            愿你永远快乐！
+                        </text>
+                    </svg>
+                `),
+                position: { top: "60%", left: "75%" },
+                size: "normal",
+                color: "pink"
+            },
+            {
+                id: 3,
+                title: "学习鼓励",
+                content: "关于学习的鼓励话语，给予前进的动力...",
+                image: "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
+                    <svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="100%" height="100%" fill="#f0ffff"/>
+                        <text x="50%" y="35%" font-family="Arial, sans-serif" font-size="24" fill="#333333" text-anchor="middle" font-weight="bold">
+                            📚 学习鼓励
+                        </text>
+                        <text x="50%" y="55%" font-family="Arial, sans-serif" font-size="16" fill="#666666" text-anchor="middle">
+                            不要害怕与别人比过，
+                        </text>
+                        <text x="50%" y="70%" font-family="Arial, sans-serif" font-size="14" fill="#666666" text-anchor="middle">
+                            每一次的努力都在为你积累奇迹！
+                        </text>
+                        <text x="50%" y="85%" font-family="Arial, sans-serif" font-size="14" fill="#666666" text-anchor="middle">
+                            加油！
+                        </text>
+                    </svg>
+                `),
+                position: { top: "15%", left: "70%" },
+                size: "normal",
+                color: "blue"
+            },
+            {
+                id: 4,
+                title: "梦想启发",
+                content: "关于梦想的美好话语，点亮心中的希望...",
+                image: "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
+                    <svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="100%" height="100%" fill="#fff8ee"/>
+                        <text x="50%" y="35%" font-family="Arial, sans-serif" font-size="24" fill="#333333" text-anchor="middle" font-weight="bold">
+                            🌟 梦想启发
+                        </text>
+                        <text x="50%" y="55%" font-family="Arial, sans-serif" font-size="16" fill="#666666" text-anchor="middle">
+                            梦想是为了有一天能实现，
+                        </text>
+                        <text x="50%" y="70%" font-family="Arial, sans-serif" font-size="14" fill="#666666" text-anchor="middle">
+                            不要害怕与别人比过！
+                        </text>
+                        <text x="50%" y="85%" font-family="Arial, sans-serif" font-size="14" fill="#666666" text-anchor="middle">
+                            相信自己！
+                        </text>
+                    </svg>
+                `),
+                position: { top: "25%", left: "80%" },
+                size: "normal",
+                color: "golden"
+            },
+            {
+                id: 5,
+                title: "友谊珍藏",
+                content: "关于友谊的珍贵话语，温暖如春风...",
+                image: "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
+                    <svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="100%" height="100%" fill="#f5fffa"/>
+                        <text x="50%" y="35%" font-family="Arial, sans-serif" font-size="24" fill="#333333" text-anchor="middle" font-weight="bold">
+                            👭 友谊珍藏
+                        </text>
+                        <text x="50%" y="55%" font-family="Arial, sans-serif" font-size="16" fill="#666666" text-anchor="middle">
+                            虽然我们不在同一个地方，
+                        </text>
+                        <text x="50%" y="70%" font-family="Arial, sans-serif" font-size="14" fill="#666666" text-anchor="middle">
+                            但我们的友谊将永远不变！
+                        </text>
+                        <text x="50%" y="85%" font-family="Arial, sans-serif" font-size="14" fill="#666666" text-anchor="middle">
+                            珍惜友谊❤️
+                        </text>
+                    </svg>
+                `),
+                position: { top: "80%", left: "40%" },
+                size: "normal",
+                color: "normal"
+            },
+            {
+                id: 6,
+                title: "感谢的话",
+                content: "真诚的感谢话语，表达内心的感激...",
+                image: "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
+                    <svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="100%" height="100%" fill="#fff5f5"/>
+                        <text x="50%" y="35%" font-family="Arial, sans-serif" font-size="24" fill="#333333" text-anchor="middle" font-weight="bold">
+                            🙏 感谢的话
+                        </text>
+                        <text x="50%" y="55%" font-family="Arial, sans-serif" font-size="16" fill="#666666" text-anchor="middle">
+                            感谢你在我的人生路上
+                        </text>
+                        <text x="50%" y="70%" font-family="Arial, sans-serif" font-size="14" fill="#666666" text-anchor="middle">
+                            写下星星点点绿意，
+                        </text>
+                        <text x="50%" y="85%" font-family="Arial, sans-serif" font-size="14" fill="#666666" text-anchor="middle">
+                            真心感谢！
+                        </text>
+                    </svg>
+                `),
+                position: { top: "35%", left: "85%" },
+                size: "small",
+                color: "pink"
+            },
+            {
+                id: 7,
+                title: "新年祝福",
+                content: "新年到来的美好祝福，带来一年的好运...",
+                image: "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
+                    <svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="100%" height="100%" fill="#fff0f0"/>
+                        <text x="50%" y="35%" font-family="Arial, sans-serif" font-size="24" fill="#333333" text-anchor="middle" font-weight="bold">
+                            🎆 新年祝福
+                        </text>
+                        <text x="50%" y="55%" font-family="Arial, sans-serif" font-size="16" fill="#666666" text-anchor="middle">
+                            新的一年我们一起来下，
+                        </text>
+                        <text x="50%" y="70%" font-family="Arial, sans-serif" font-size="14" fill="#666666" text-anchor="middle">
+                            愿你健康快乐，
+                        </text>
+                        <text x="50%" y="85%" font-family="Arial, sans-serif" font-size="14" fill="#666666" text-anchor="middle">
+                            努力向上！
+                        </text>
+                    </svg>
+                `),
+                position: { top: "70%", left: "20%" },
+                size: "normal",
+                color: "golden"
+            },
+            {
+                id: 8,
+                title: "成长记录",
+                content: "记录成长点滴的温暖文字，见证每一步进步...",
+                image: "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
+                    <svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="100%" height="100%" fill="#f8ffff"/>
+                        <text x="50%" y="35%" font-family="Arial, sans-serif" font-size="24" fill="#333333" text-anchor="middle" font-weight="bold">
+                            👑 成长记录
+                        </text>
+                        <text x="50%" y="55%" font-family="Arial, sans-serif" font-size="16" fill="#666666" text-anchor="middle">
+                            你每一次的进步，
+                        </text>
+                        <text x="50%" y="70%" font-family="Arial, sans-serif" font-size="14" fill="#666666" text-anchor="middle">
+                            都让我们总得不与自己共同成长。
+                        </text>
+                        <text x="50%" y="85%" font-family="Arial, sans-serif" font-size="14" fill="#666666" text-anchor="middle">
+                            加油成长！
+                        </text>
+                    </svg>
+                `),
+                position: { top: "65%", left: "75%" },
+                size: "normal",
+                color: "blue"
+            }
+        ];
+
+        // 粒子系统
+        function createParticles() {
+            const particleCount = 30;
+            const gallery = document.getElementById('gallery');
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.width = Math.random() * 4 + 2 + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 4 + 's';
+                particle.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                gallery.appendChild(particle);
+            }
+        }
+        
+        // 背景星星系统
+        function createBackgroundStars(avoidZones = []) {
+            const starCount = 200; // 增加背景星星数量
+            const starTypes = ['tiny', 'small', 'medium', 'bright'];
+            const starWeights = [60, 25, 10, 5]; // 不同大小星星的权重
+            
+            // 如果已经存在背景星星容器，先删除它
+            const existingContainer = document.getElementById('bg-star-container');
+            if (existingContainer) {
+                existingContainer.remove();
+            }
+            
+            // 创建背景星星容器
+            const bgStarContainer = document.createElement('div');
+            bgStarContainer.id = 'bg-star-container';
+            bgStarContainer.style.position = 'fixed';
+            bgStarContainer.style.top = '0';
+            bgStarContainer.style.left = '0';
+            bgStarContainer.style.width = '100%';
+            bgStarContainer.style.height = '100%';
+            bgStarContainer.style.zIndex = '2';
+            bgStarContainer.style.pointerEvents = 'none';
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                
+                // 根据权重随机选择星星类型
+                const randomWeight = Math.random() * 100;
+                let starType = 'tiny';
+                let cumulativeWeight = 0;
+                
+                for (let j = 0; j < starWeights.length; j++) {
+                    cumulativeWeight += starWeights[j];
+                    if (randomWeight <= cumulativeWeight) {
+                        starType = starTypes[j];
+                        break;
+                    }
+                }
+                
+                star.className = `bg-star ${starType}`;
+                
+                // 生成不与避让区域重叠的位置
+                let starTop, starLeft;
+                let attempts = 0;
+                const maxAttempts = 10;
+                
+                do {
+                    starTop = Math.random() * 100;
+                    starLeft = Math.random() * 100;
+                    attempts++;
+                } while (attempts < maxAttempts && isOverlapping(starTop, starLeft, avoidZones));
+                
+                star.style.top = starTop + '%';
+                star.style.left = starLeft + '%';
+                star.style.animationDelay = Math.random() * 4 + 's';
+                star.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                
+                bgStarContainer.appendChild(star);
+            }
+            
+            // 将背景星星容器添加到body中，这样它们始终可见
+            document.body.appendChild(bgStarContainer);
+        }
+        
+        // 检查是否与避让区域重叠
+        function isOverlapping(starTop, starLeft, avoidZones) {
+            for (let zone of avoidZones) {
+                const distance = Math.sqrt(
+                    Math.pow(starTop - zone.top, 2) + Math.pow(starLeft - zone.left, 2)
+                );
+                if (distance < zone.radius) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        // 生成避让区域
+        function generateAvoidZones() {
+            const zones = [
+                // 演示星星的固定位置
+                { top: 25, left: 15, radius: 8 },  // 第一封信
+                { top: 60, left: 75, radius: 8 },  // 生日祝福
+                { top: 15, left: 70, radius: 8 },  // 学习鼓励
+                { top: 25, left: 80, radius: 8 },  // 梦想启发
+                { top: 80, left: 40, radius: 8 },  // 友谊珍藏
+                { top: 35, left: 85, radius: 6 },  // 感谢的话
+                { top: 70, left: 20, radius: 8 },  // 新年祝福
+                { top: 65, left: 75, radius: 8 }   // 成长记录
+            ];
+            
+            // 为真实NFT星星添加避让区域
+            demoStars.forEach(star => {
+                if (star.isReal) {
+                    zones.push({
+                        top: parseFloat(star.position.top),
+                        left: parseFloat(star.position.left),
+                        radius: 12 // 真实NFT星星需要更大的避让区域
+                    });
+                }
+            });
+            
+            return zones;
+        }
+
+        // 统计数据
+        let stats = {
+            starCount: 0,
+            realNftCount: 0,
+            memoryCount: 0,
+            brightness: 0
+        };
+
+        function updateStats() {
+            document.getElementById('star-count').textContent = stats.starCount;
+            document.getElementById('real-nft-count').textContent = stats.realNftCount;
+            document.getElementById('memory-count').textContent = stats.memoryCount;
+            document.getElementById('brightness').textContent = stats.brightness;
+        }
+
+        function animateNumber(element, targetNumber, duration = 1000) {
+            const startNumber = parseInt(element.textContent) || 0;
+            const increment = (targetNumber - startNumber) / (duration / 16);
+            let currentNumber = startNumber;
+            
+            const timer = setInterval(() => {
+                currentNumber += increment;
+                if (currentNumber >= targetNumber) {
+                    currentNumber = targetNumber;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(currentNumber);
+            }, 16);
+        }
+
+        // 应用逻辑
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginButton = document.getElementById('login-button');
+            const passwordInput = document.getElementById('password-input');
+            const loginScreen = document.getElementById('login-screen');
+            const gallery = document.getElementById('gallery');
+            const loadingIndicator = document.getElementById('loading-indicator');
+            const statsDiv = document.getElementById('stats');
+            
+            // 创建粒子效果和背景星星
+            createParticles();
+            createBackgroundStars(); // 立即创建背景星星，让整个页面都有星空效果
+            
+            // 回车键登录
+            passwordInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    loginButton.click();
+                }
+            });
+            
+            loginButton.addEventListener('click', () => {
+                if (passwordInput.value === '1234') {
+                    loginScreen.classList.add('fade-out');
+                    setTimeout(() => {
+                        loginScreen.style.display = 'none';
+                        gallery.classList.add('active');
+                        loadStars();
+                    }, 1000);
+                } else {
+                    // 错误提示动画
+                    passwordInput.style.borderColor = '#ff4757';
+                    passwordInput.style.animation = 'shake 0.5s ease-in-out';
+                    setTimeout(() => {
+                        passwordInput.style.borderColor = 'var(--accent-color)';
+                        passwordInput.style.animation = '';
+                    }, 500);
+                }
+            });
+
+            // 错误动画
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    25% { transform: translateX(-5px); }
+                    75% { transform: translateX(5px); }
+                }
+            `;
+            document.head.appendChild(style);
+
+            // 信件查看器
+            const letterViewer = document.getElementById('letter-viewer');
+            const closeViewer = document.getElementById('close-viewer');
+            const letterImage = document.getElementById('letter-image');
+            
+            closeViewer.addEventListener('click', closeLetter);
+            letterViewer.addEventListener('click', (e) => {
+                if (e.target === letterViewer) {
+                    closeLetter();
+                }
+            });
+
+            function closeLetter() {
+                letterViewer.classList.remove('active');
+                setTimeout(() => {
+                    letterViewer.style.display = 'none';
+                }, 300);
+            }
+
+            // 演示模式加载星星
+            async function loadStars() {
+                loadingIndicator.classList.add('active');
+                console.log("--- 星空宝盒加载中 ---");
+                
+                // 显示统计面板
+                setTimeout(() => {
+                    statsDiv.classList.add('active');
+                }, 500);
+                
+                // 加载真实NFT数据
+                await loadRealNFTs();
+                
+                // 计算真实NFT数量
+                const realNftCount = demoStars.filter(star => star.isReal && star.tokenId).length;
+                stats.realNftCount = realNftCount;
+                
+                // 逐个创建星星
+                demoStars.forEach((starData, index) => {
+                    setTimeout(() => {
+                        createStar(starData, index);
+                        
+                        // 更新统计
+                        stats.starCount = index + 1;
+                        stats.memoryCount = index + 1;
+                        stats.brightness = Math.min((index + 1) * 11, 100);
+                        
+                        // 数字动画
+                        animateNumber(document.getElementById('star-count'), stats.starCount);
+                        animateNumber(document.getElementById('real-nft-count'), stats.realNftCount);
+                        animateNumber(document.getElementById('memory-count'), stats.memoryCount);
+                        animateNumber(document.getElementById('brightness'), stats.brightness);
+                        
+                        // 最后一颗星星创建完成后隐藏加载指示器
+                        if (index === demoStars.length - 1) {
+                            setTimeout(() => {
+                                loadingIndicator.classList.remove('active');
+                            }, 1000);
+                        }
+                    }, (index + 1) * 600); // 每颗星星间隔600ms出现
+                });
+            }
+
+            // 加载真实NFT数据
+            async function loadRealNFTs() {
+                try {
+                    console.log("尝试加载真实NFT数据...");
+                    const provider = new ethers.JsonRpcProvider(rpcUrl);
+                    const contract = new ethers.Contract(contractAddress, contractABI, provider);
+                    
+                    // 检查是否有NFT
+                    const balance = await contract.balanceOf(nftOwnerAddress);
+                    console.log(`找到 ${balance.toString()} 个真实NFT`);
+                    
+                    if (balance > 0) {
+                        const realNFTs = [];
+                        // 遍历所有可能的token ID，找到该地址拥有的所有NFT
+                        for (let i = 1; i <= 100; i++) { // 增加检查范围
+                            try {
+                                const owner = await contract.ownerOf(i);
+                                if (owner.toLowerCase() === nftOwnerAddress.toLowerCase()) {
+                                    console.log(`找到真实NFT Token ID: ${i}`);
+                                    
+                                    try {
+                                        const tokenURI = await contract.tokenURI(i);
+                                        const metadataUrl = `https://gateway.pinata.cloud/ipfs/${tokenURI}`;
+                                        const metadataResponse = await fetch(metadataUrl);
+                                        
+                                        if (metadataResponse.ok) {
+                                            const metadata = await metadataResponse.json();
+                                            const imageUrl = `https://gateway.pinata.cloud/ipfs/${metadata.image.replace('ipfs://', '')}`;
+                                            
+                                            realNFTs.push({
+                                                tokenId: i,
+                                                title: metadata.name || `真实回忆 #${i}`,
+                                                content: metadata.description || "这是一份珍贵的真实回忆",
+                                                image: imageUrl
+                                            });
+                                        }
+                                    } catch (metadataError) {
+                                        console.log(`Token ${i} 元数据获取失败:`, metadataError);
+                                        // 即使元数据获取失败，也添加占位符
+                                        realNFTs.push({
+                                            tokenId: i,
+                                            title: `真实回忆 #${i}`,
+                                            content: "这是一份珍贵的真实回忆",
+                                            image: createPlaceholderImage(i)
+                                        });
+                                    }
+                                    
+                                    // 如果已经找到了目标数量的NFT，停止搜索
+                                    if (realNFTs.length >= balance) {
+                                        break;
+                                    }
+                                }
+                            } catch (e) {
+                                // Token不存在或其他错误，继续检查下一个
+                            }
+                        }
+                        
+                        // 为每个真实NFT创建星星数据
+                        const nftPositions = generateNFTPositions(realNFTs.length);
+                        realNFTs.forEach((nft, index) => {
+                            const realStarData = {
+                                id: `real-${nft.tokenId}`,
+                                title: nft.title,
+                                content: nft.content,
+                                image: nft.image,
+                                position: nftPositions[index],
+                                size: "large",
+                                color: "golden",
+                                isReal: true,
+                                tokenId: nft.tokenId
+                            };
+                            
+                            // 插入到数组开头，让真实NFT星星优先显示
+                            demoStars.unshift(realStarData);
+                        });
+                        
+                        console.log(`成功加载 ${realNFTs.length} 个真实NFT数据！`);
+                    } else {
+                        console.log("该地址没有拥有任何NFT，添加占位符");
+                        // 添加一个占位符星星
+                        const placeholderStar = {
+                            id: "placeholder-0",
+                            title: "等待中的回忆",
+                            content: "这里将显示你的第一个NFT回忆...",
+                            image: createPlaceholderImage(0),
+                            position: { top: "48%", left: "48%" },
+                            size: "large",
+                            color: "golden",
+                            isReal: true,
+                            tokenId: null
+                        };
+                        demoStars.unshift(placeholderStar);
+                    }
+                } catch (error) {
+                    console.log("加载真实NFT失败，将使用占位符:", error.message);
+                    // 使用占位符
+                    const placeholderStar = {
+                        id: "placeholder-error",
+                        title: "连接中的回忆",
+                        content: "正在连接到区块链网络...",
+                        image: createPlaceholderImage("error"),
+                        position: { top: "48%", left: "48%" },
+                        size: "large",
+                        color: "golden",
+                        isReal: true,
+                        tokenId: null
+                    };
+                    demoStars.unshift(placeholderStar);
+                }
+                
+                // 重新创建背景星星，考虑真实NFT的位置
+                const avoidZones = generateAvoidZones();
+                createBackgroundStars(avoidZones);
+            }
+
+            // 生成NFT星星的位置
+            function generateNFTPositions(count) {
+                const positions = [];
+                
+                if (count === 1) {
+                    // 单个NFT放在中心
+                    positions.push({ top: "48%", left: "48%" });
+                } else if (count <= 3) {
+                    // 少量NFT水平排列在中心
+                    const centerLeft = 48;
+                    const spacing = 15;
+                    const startLeft = centerLeft - ((count - 1) * spacing / 2);
+                    
+                    for (let i = 0; i < count; i++) {
+                        positions.push({
+                            top: "48%",
+                            left: `${startLeft + i * spacing}%`
+                        });
+                    }
+                } else {
+                    // 多个NFT形成圆形排列
+                    const centerX = 48;
+                    const centerY = 48;
+                    const radius = 20;
+                    
+                    for (let i = 0; i < count; i++) {
+                        const angle = (i * 2 * Math.PI) / count;
+                        const x = centerX + radius * Math.cos(angle);
+                        const y = centerY + radius * Math.sin(angle);
+                        
+                        positions.push({
+                            top: `${Math.max(10, Math.min(90, y))}%`,
+                            left: `${Math.max(10, Math.min(90, x))}%`
+                        });
+                    }
+                }
+                
+                return positions;
+            }
+
+            // 创建占位符图像
+            function createPlaceholderImage(id) {
+                const messages = [
+                    "真实的回忆",
+                    "珍贵的时刻", 
+                    "温暖的话语",
+                    "美好的祝愿",
+                    "连接中的回忆"
+                ];
+                
+                const message = typeof id === 'number' ? messages[id % messages.length] : messages[4];
+                
+                return `data:image/svg+xml;base64,${btoa(`
+                    <svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="100%" height="100%" fill="#fff8ee"/>
+                        <text x="50%" y="40%" font-family="Arial" font-size="20" fill="#333333" text-anchor="middle">
+                            🌟 ${message}
+                        </text>
+                        <text x="50%" y="60%" font-family="Arial" font-size="14" fill="#666666" text-anchor="middle">
+                            这里将显示来自区块链的珍贵回忆
+                        </text>
+                    </svg>
+                `)}`;
+            }
+
+            function createStar(starData, index) {
+                const star = document.createElement('div');
+                let className = `star clickable appearing ${starData.size || 'normal'} ${starData.color || 'normal'}`;
+                
+                // 如果是真实NFT星星，添加特殊类
+                if (starData.isReal) {
+                    className += ' real-nft';
+                }
+                
+                star.className = className;
+                star.style.top = starData.position.top;
+                star.style.left = starData.position.left;
+                star.style.animationDelay = `${Math.random() * 2}s`;
+                
+                // 点击事件
+                star.addEventListener('click', () => {
+                    letterImage.src = starData.image;
+                    letterViewer.classList.add('active');
+                    letterViewer.style.display = 'flex';
+                    
+                    // 为真实NFT添加特殊标识
+                    if (starData.isReal && starData.tokenId) {
+                        // 创建NFT信息标签
+                        let nftInfo = document.getElementById('nft-info');
+                        if (!nftInfo) {
+                            nftInfo = document.createElement('div');
+                            nftInfo.id = 'nft-info';
+                            nftInfo.style.cssText = `
+                                position: absolute;
+                                top: 30px;
+                                left: 30px;
+                                background: rgba(255, 215, 0, 0.95);
+                                color: #000;
+                                padding: 12px 18px;
+                                border-radius: 25px;
+                                font-family: 'ZCOOL KuaiLe', cursive;
+                                font-size: 14px;
+                                font-weight: bold;
+                                box-shadow: 
+                                    0 4px 20px rgba(255, 215, 0, 0.5),
+                                    0 0 25px rgba(255, 215, 0, 0.3);
+                                backdrop-filter: blur(10px);
+                                border: 2px solid rgba(255, 255, 255, 0.6);
+                                z-index: 1001;
+                            `;
+                            letterViewer.appendChild(nftInfo);
+                        }
+                        nftInfo.textContent = `🌟 真实NFT #${starData.tokenId}`;
+                        nftInfo.style.display = 'block';
+                    } else {
+                        // 隐藏NFT信息标签
+                        const nftInfo = document.getElementById('nft-info');
+                        if (nftInfo) {
+                            nftInfo.style.display = 'none';
+                        }
+                    }
+                    
+                    // 真实NFT星星的特殊点击反馈
+                    if (starData.isReal) {
+                        star.style.transform = 'scale(2.5)';
+                        star.style.filter = 'drop-shadow(0 0 30px gold)';
+                        setTimeout(() => {
+                            star.style.transform = '';
+                            star.style.filter = '';
+                        }, 400);
+                    } else {
+                        star.style.transform = 'scale(2)';
+                        setTimeout(() => {
+                            star.style.transform = '';
+                        }, 300);
+                    }
+                });
+                
+                gallery.appendChild(star);
+                
+                // 创建完成后移除appearing类，但保留其他类
+                setTimeout(() => {
+                    star.classList.remove('appearing');
+                }, 800);
+            }
+        });
+
+        // 键盘快捷键
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const letterViewer = document.getElementById('letter-viewer');
+                if (letterViewer.classList.contains('active')) {
+                    letterViewer.classList.remove('active');
+                    setTimeout(() => {
+                        letterViewer.style.display = 'none';
+                    }, 300);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
