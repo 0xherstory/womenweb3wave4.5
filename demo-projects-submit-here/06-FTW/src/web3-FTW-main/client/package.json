@@ -1,0 +1,57 @@
+{
+  "name": "ftw-dapp",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@fortawesome/fontawesome-svg-core": "^6.5.1",
+    "@fortawesome/free-brands-svg-icons": "^6.5.1",
+    "@fortawesome/free-regular-svg-icons": "^6.5.1",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@fortawesome/react-fontawesome": "^0.2.2",
+    "@mui/material": "^7.2.0",
+    "@mui/x-date-pickers": "^8.7.0",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@web3modal/ethereum": "^2.7.1",
+    "@web3modal/react": "^2.7.1",
+    "crypto-js": "^4.2.0",
+    "date-fns": "^4.1.0",
+    "ethers": "^5.7.2",
+    "react": "^18.2.0",
+    "react-datepicker": "^4.16.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.0",
+    "react-scripts": "5.0.1",
+    "sass": "^1.70.0",
+    "wagmi": "^1.4.12",
+    "web-vitals": "^2.1.4",
+    "web3": "^1.10.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

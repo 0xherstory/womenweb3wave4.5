@@ -1,0 +1,78 @@
+# Remix compiler artifacts
+**/artifacts/
+**/artifacts/**
+
+# Remix plugin state folders
+deps/
+states/
+
+# Debug info
+*.dbg.json
+*.tsbuildinfo
+
+# Optional
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# 前端依赖
+/node_modules
+/client/node_modules
+**/node_modules
+/.pnp
+.pnp.js
+
+# 前端构建文件
+/build
+/client/build
+/dist
+/client/dist
+
+# 测试覆盖率
+/coverage
+
+# 日志文件
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# 操作系统文件
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE 和编辑器
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# 本地缓存
+.eslintcache
+.cache/
+.parcel-cache/
+
+# 自动生成的文件
+.docusaurus
+.cache-loader

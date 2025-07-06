@@ -1,0 +1,694 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "enum CampStorage.CampState",
+        "name": "previousState",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum CampStorage.CampState",
+        "name": "newState",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "CampStateChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "participant",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "challengeIndex",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "ChallengeCompleted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "challengeCount",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "ChallengesConfigured",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "participant",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "DepositWithdrawn",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "organizer",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint16",
+        "name": "forfeitedCount",
+        "type": "uint16"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "DepositsForfeited",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "participant",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "depositAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "ParticipantRegistered",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "_participants",
+        "type": "address[]"
+      }
+    ],
+    "name": "batchRefundDeposits",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "campEndDate",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "challengeCount",
+    "outputs": [
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "challenges",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "deadline",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "passwordHash",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "enum CampStorage.ChallengeState",
+        "name": "state",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint16",
+        "name": "completedCount",
+        "type": "uint16"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "checkCampCompletion",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "checkCampState",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "completedCount",
+    "outputs": [
+      {
+        "internalType": "uint16",
+        "name": "",
+        "type": "uint16"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "_deadlines",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "_passwordHashes",
+        "type": "bytes32[]"
+      }
+    ],
+    "name": "configChallenges",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "depositAmount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "depositsWithdrawn",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "factory",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "forfeitDeposits",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getBalance",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getCampInfo",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "_organizer",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "_name",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_signupDeadline",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_campEndDate",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint8",
+        "name": "_challengeCount",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint16",
+        "name": "_minParticipants",
+        "type": "uint16"
+      },
+      {
+        "internalType": "uint16",
+        "name": "_maxParticipants",
+        "type": "uint16"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_depositAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum CampStorage.CampState",
+        "name": "_state",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint16",
+        "name": "_participantCount",
+        "type": "uint16"
+      },
+      {
+        "internalType": "uint16",
+        "name": "_completedCount",
+        "type": "uint16"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "_index",
+        "type": "uint8"
+      }
+    ],
+    "name": "getChallengeInfo",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "_deadline",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum CampStorage.ChallengeState",
+        "name": "_state",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint16",
+        "name": "_completedCount",
+        "type": "uint16"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_participant",
+        "type": "address"
+      }
+    ],
+    "name": "getParticipantInfo",
+    "outputs": [
+      {
+        "internalType": "enum CampStorage.ParticipantState",
+        "name": "_state",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint8",
+        "name": "_completedChallenges",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_registrationTime",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool[]",
+        "name": "_challengesCompleted",
+        "type": "bool[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_organizer",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "_name",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_signupDeadline",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_campEndDate",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint8",
+        "name": "_challengeCount",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint16",
+        "name": "_minParticipants",
+        "type": "uint16"
+      },
+      {
+        "internalType": "uint16",
+        "name": "_maxParticipants",
+        "type": "uint16"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_depositAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "maxParticipants",
+    "outputs": [
+      {
+        "internalType": "uint16",
+        "name": "",
+        "type": "uint16"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "minParticipants",
+    "outputs": [
+      {
+        "internalType": "uint16",
+        "name": "",
+        "type": "uint16"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "name",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "organizer",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "participantAddresses",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "participantCount",
+    "outputs": [
+      {
+        "internalType": "uint16",
+        "name": "",
+        "type": "uint16"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "participants",
+    "outputs": [
+      {
+        "internalType": "enum CampStorage.ParticipantState",
+        "name": "state",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint8",
+        "name": "completedChallenges",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "registrationTime",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "register",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "signupDeadline",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "state",
+    "outputs": [
+      {
+        "internalType": "enum CampStorage.CampState",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "_challengeIndex",
+        "type": "uint8"
+      },
+      {
+        "internalType": "string",
+        "name": "_password",
+        "type": "string"
+      }
+    ],
+    "name": "submitChallengePassword",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "_challengeIndex",
+        "type": "uint8"
+      }
+    ],
+    "name": "updateChallengeState",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "withdrawDepositOnCompletion",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "withdrawDepositOnFailure",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

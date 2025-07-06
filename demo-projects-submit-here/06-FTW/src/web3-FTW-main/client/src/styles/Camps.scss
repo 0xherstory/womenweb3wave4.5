@@ -1,0 +1,654 @@
+@import './globals.scss';
+
+.camps-page {
+  background: linear-gradient(135deg, #0c0c0c 0%, #1a1a1a 100%);
+  color: white;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+
+  /* 覆盖导航栏样式，使其与demo完全一致 */
+  .navbar {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 3rem;
+    background: rgba(10, 10, 10, 0.95);
+    backdrop-filter: blur(10px);
+    z-index: 100;
+    border-bottom: 1px solid #d32222;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+
+    .logo {
+      font-size: 2rem;
+      font-weight: 900;
+      background: linear-gradient(to right, #d32222, #d96565);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      
+      span {
+        color: white;
+      }
+    }
+
+    /* 语言切换 */
+    .language-switcher {
+      margin-right: 20px;
+      
+      .lang-btn {
+        background: rgba(211, 34, 34, 0.2);
+        color: #d96565;
+        border: 1px solid #d32222;
+        padding: 8px 15px;
+        border-radius: 30px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        
+        &:hover {
+          background: rgba(211, 34, 34, 0.4);
+        }
+      }
+    }
+
+    /* 个人空间菜单 */
+    .user-menu {
+      position: relative;
+      display: flex;
+      align-items: center;
+      
+      .user-btn {
+        background: linear-gradient(to right, #d32222, #d96565);
+        color: white;
+        border: none;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        font-size: 1.5rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        
+        &:hover {
+          transform: scale(1.05);
+        }
+      }
+      
+      .dropdown {
+        position: absolute;
+        top: 120%;
+        right: 0;
+        background: rgba(20, 20, 20, 0.95);
+        border: 1px solid #333;
+        border-radius: 10px;
+        width: 250px;
+        overflow: hidden;
+        transform: translateY(10px);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        z-index: 20;
+        
+        &.active {
+          transform: translateY(0);
+          opacity: 1;
+          visibility: visible;
+        }
+        
+        .dropdown-item {
+          padding: 1.2rem;
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          font-size: 1.1rem;
+          color: #ccc;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          border-bottom: 1px solid #222;
+          
+          &:last-child {
+            border-bottom: none;
+          }
+          
+          &:hover {
+            background: rgba(211, 34, 34, 0.1);
+            color: white;
+          }
+          
+          svg {
+            width: 25px;
+            color: #d32222;
+            font-size: 1.2rem;
+          }
+        }
+      }
+    }
+  }
+
+  /* 背景装饰 */
+  .background-elements {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    
+    .bg-element {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.1;
+      filter: blur(30px);
+      
+      &.bg-red {
+        width: 300px;
+        height: 300px;
+        background: linear-gradient(to right, #d32222, #d96565);
+        top: 20%;
+        left: 10%;
+      }
+      
+      &.bg-purple {
+        width: 200px;
+        height: 200px;
+        background: linear-gradient(to right, #6a11cb, #2575fc);
+        top: 60%;
+        right: 15%;
+      }
+    }
+  }
+
+  /* 主内容区 */
+  .container {
+    max-width: 1400px;
+    margin: 30px auto;
+    padding: 2rem;
+    position: relative;
+    z-index: 2;
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 20px;
+      
+      h1 {
+        font-size: 2.5rem;
+        background: linear-gradient(to right, #d32222, #d96565);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        text-shadow: 0 0 15px rgba(211, 34, 34, 0.3);
+      }
+      
+      /* 创建营地按钮 */
+      .create-btn {
+        background: linear-gradient(to right, #d32222, #d96565);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 50px;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: bold;
+        box-shadow: 0 5px 15px rgba(211, 34, 34, 0.3);
+        
+        &:hover {
+          transform: scale(1.05);
+          box-shadow: 0 8px 20px rgba(211, 34, 34, 0.5);
+        }
+      }
+    }
+    
+    /* 筛选菜单 */
+    .filter-menu {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+      
+      .filter-btn {
+        padding: 10px 20px;
+        border-radius: 30px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        background: rgba(30, 30, 30, 0.7);
+        
+        &:hover, &.active {
+          transform: translateY(-3px);
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        &.all {
+          background: rgba(255, 255, 255, 0.9);
+          color: #222;
+        }
+        
+        &.signup {
+          background: white;
+          color: #222;
+        }
+        
+        &.failed {
+          background: #000;
+          color: white;
+        }
+        
+        &.success {
+          background: linear-gradient(to right, #d32222, #d96565);
+          color: white;
+        }
+        
+        &.running {
+          background: linear-gradient(to right, #d32222, #d96565);
+          color: #FFD700;
+        }
+        
+        &.completed {
+          background: linear-gradient(to right, #d32222, #d96565);
+          color: #000;
+        }
+      }
+    }
+    
+    /* 营地卡片网格 */
+    .camps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 30px;
+      margin-top: 20px;
+      
+      .camp-card {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        transition: all 0.4s ease;
+        height: 250px;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        background: rgba(20, 20, 20, 0.7);
+        border: 1px solid #333;
+        cursor: pointer;
+        box-sizing: border-box;
+        padding: 1.5rem;
+        
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(135deg, rgba(211, 34, 34, 0.15), rgba(217, 101, 101, 0.15));
+          z-index: 1;
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+        
+        &:hover {
+          transform: translateY(-10px);
+          box-shadow: 0 15px 40px rgba(211, 34, 34, 0.2);
+          
+          &::before {
+            opacity: 1;
+          }
+        }
+        
+        h2 {
+          font-size: 1.8rem;
+          margin-bottom: 0.5rem;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          width: 100%;
+          text-align: left;
+          max-width: calc(100% - 40px);
+          padding-right: 10px;
+          margin-top: 10px;
+          position: relative;
+          z-index: 2;
+        }
+        
+        .camp-date {
+          font-size: 0.9rem;
+          color: rgba(255, 255, 255, 0.7);
+          text-align: left;
+          width: 100%;
+          margin-top: 0.5rem;
+          position: relative;
+          z-index: 2;
+        }
+        
+        /* 状态视觉指示器 */
+        .status-indicator {
+          position: absolute;
+          top: 15px;
+          right: 15px;
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.2rem;
+          z-index: 3;
+          background-color: rgba(0, 0, 0, 0.2);
+          
+          /* 状态信息提示 */
+          .status-tooltip {
+            position: absolute;
+            top: 40px;
+            right: 0;
+            background: rgba(20, 20, 20, 0.9);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            transform: translateY(10px);
+            z-index: 10;
+            border: 1px solid #d32222;
+            white-space: nowrap;
+            color: white; /* 确保所有状态的提示文字都是白色 */
+          }
+          
+          &:hover .status-tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+          }
+        }
+        
+        /* 卡片底部区域 - 左右分区 */
+        .camp-footer {
+          display: flex;
+          height: 80px;
+          position: relative;
+          z-index: 2;
+          margin-top: auto;
+          overflow: hidden;
+          margin-left: -1.5rem;
+          margin-right: -1.5rem;
+          margin-bottom: -1.5rem;
+          
+          > div {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            
+            .value {
+              font-size: 2rem;
+              font-weight: bold;
+              margin-bottom: 5px;
+              line-height: 1;
+            }
+            
+            .label {
+              font-size: 0.9rem;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              width: 100%;
+              text-align: center;
+            }
+          }
+        }
+        
+        /* 不同状态的卡片样式 */
+        &.signup {
+          background: white;
+          color: #222;
+          
+          .camp-date {
+            color: #666;
+          }
+          
+          .status-indicator {
+            background: rgba(0, 0, 0, 0.1);
+            color: #222;
+          }
+        }
+        
+        &.failed {
+          background: #000;
+          color: white;
+          
+          .status-indicator {
+            color: #d32222;
+          }
+        }
+        
+        &.success {
+          background: linear-gradient(135deg, rgba(211, 34, 34, 0.8), rgba(217, 101, 101, 0.8));
+          color: white;
+        }
+        
+        &.running {
+          background: linear-gradient(135deg, rgba(211, 34, 34, 0.8), rgba(217, 101, 101, 0.8));
+          color: #FFD700;
+          
+          .status-indicator {
+            color: #FFD700;
+          }
+        }
+        
+        &.completed {
+          background: linear-gradient(135deg, rgba(211, 34, 34, 0.8), rgba(217, 101, 101, 0.8));
+          color: #000;
+          
+          .status-indicator {
+            color: #000;
+          }
+        }
+      }
+      
+      /* 加载状态 */
+      .loading-state {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 4rem;
+        background: rgba(30, 30, 30, 0.5);
+        border-radius: 15px;
+        border: 2px solid #444;
+        
+        .loading-spinner {
+          font-size: 3rem;
+          color: #d32222;
+          margin-bottom: 1.5rem;
+          animation: spin 1s linear infinite;
+        }
+        
+        h3 {
+          font-size: 1.8rem;
+          margin-bottom: 1rem;
+          color: #d96565;
+        }
+        
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      }
+      
+      /* 错误状态 */
+      .error-state {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 4rem;
+        background: rgba(30, 30, 30, 0.5);
+        border-radius: 15px;
+        border: 2px solid #d32222;
+        
+        svg {
+          font-size: 4rem;
+          color: #d32222;
+          margin-bottom: 1.5rem;
+        }
+        
+        h3 {
+          font-size: 1.8rem;
+          margin-bottom: 1rem;
+          color: #d32222;
+        }
+        
+        p {
+          color: #ccc;
+          margin-bottom: 2rem;
+        }
+        
+        .retry-btn {
+          background: linear-gradient(to right, #d32222, #d96565);
+          color: white;
+          border: none;
+          padding: 12px 30px;
+          border-radius: 30px;
+          font-size: 1rem;
+          font-weight: bold;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(211, 34, 34, 0.4);
+          }
+        }
+      }
+      
+      /* 空状态 */
+      .empty-state {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 4rem;
+        background: rgba(30, 30, 30, 0.5);
+        border-radius: 15px;
+        border: 2px dashed #444;
+        
+        svg {
+          font-size: 4rem;
+          color: #d32222;
+          margin-bottom: 1.5rem;
+        }
+        
+        h3 {
+          font-size: 1.8rem;
+          margin-bottom: 1rem;
+          color: #d32222;
+        }
+        
+        p {
+          color: #ccc;
+          margin-bottom: 2rem;
+        }
+        
+        .create-btn-empty {
+          background: linear-gradient(to right, #d32222, #d96565);
+          color: white;
+          border: none;
+          padding: 15px 35px;
+          border-radius: 30px;
+          font-size: 1.1rem;
+          font-weight: bold;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(211, 34, 34, 0.4);
+          }
+        }
+      }
+    }
+  }
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+  .camps-page .container .camps-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .camps-page {
+    .navbar {
+      padding: 1rem 2rem;
+    }
+    
+    .container {
+      padding: 1.5rem;
+      
+      .header h1 {
+        font-size: 2rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .camps-page {
+    .navbar {
+      padding: 1rem;
+      
+      .logo {
+        font-size: 1.5rem;
+      }
+    }
+    
+    .container {
+      padding: 1rem;
+      margin-top: 15px;
+      
+      .filter-menu {
+        justify-content: center;
+      }
+      
+      .header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+      
+      .camps-grid {
+        grid-template-columns: 1fr;
+        
+        .camp-card {
+          height: 220px;
+        }
+      }
+    }
+  }
+} 
