@@ -1,0 +1,31 @@
+{
+  "name": "learn-to-earn",
+  "version": "1.0.0",
+  "description": "Learn-to-Earn blockchain application",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx hardhat test",
+    "node": "npx hardhat node",
+    "deploy:telos": "npx hardhat run scripts/deploy.js --network telos",
+    "deploy:local": "npx hardhat run scripts/deploy.js --network localhost",
+    "deploy:sepolia": "npx hardhat run scripts/deploy.js --network sepolia"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^6.0.0",
+    "@nomiclabs/hardhat-etherscan": "^3.1.8",
+    "@openzeppelin/contracts": "^5.3.0",
+    "dotenv": "^16.6.1",
+    "hardhat": "^2.25.0",
+    "hardhat-contract-sizer": "^2.8.0"
+  },
+  "resolutions": {
+    "ethers": "^6.15.0"
+  },
+  "dependencies": {
+    "@nomicfoundation/hardhat-verify": "^2.0.14"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}

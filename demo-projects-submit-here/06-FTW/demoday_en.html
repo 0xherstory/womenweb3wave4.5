@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hersolidity Demo Day - FTW Project Presentation</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Gochi+Hand&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+        
+        :root {
+            --primary: #e74c3c;
+            --secondary: #3498db;
+            --accent: #f39c12;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+        }
+        
+        body {
+            font-family: 'Comic Neue', cursive;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            background-image: radial-gradient(#e0e0e0 1px, transparent 1px);
+            background-size: 20px 20px;
+            color: var(--dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .handwritten {
+            font-family: 'Gochi Hand', cursive;
+            font-weight: normal;
+            letter-spacing: 1px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .slide {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 40px;
+            margin: 40px auto;
+            position: relative;
+            min-height: 500px;
+            border: 2px solid var(--dark);
+            transform: rotate(-0.5deg);
+        }
+        
+        .slide::before {
+            content: "";
+            position: absolute;
+            top: -15px;
+            left: -15px;
+            right: -15px;
+            bottom: -15px;
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            z-index: -1;
+            transform: rotate(1deg);
+        }
+        
+        .slide::after {
+            content: "";
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            right: -8px;
+            bottom: -8px;
+            border: 1px dashed rgba(231, 76, 60, 0.3);
+            border-radius: 10px;
+            z-index: -1;
+        }
+        
+        h1, h2, h3 {
+            font-family: 'Gochi Hand', cursive;
+            color: var(--primary);
+            margin-top: 0;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            text-align: center;
+            color: var(--dark);
+            text-shadow: 3px 3px 0 var(--accent);
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            font-size: 2.5rem;
+            border-bottom: 3px dashed var(--accent);
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+            display: inline-block;
+        }
+        
+        .section-title {
+            background-color: var(--accent);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 30px;
+            display: inline-block;
+            transform: rotate(-2deg);
+            margin-bottom: 20px;
+        }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .content-block {
+            padding: 20px;
+            border: 2px solid var(--dark);
+            border-radius: 8px;
+            background-color: rgba(236, 240, 241, 0.5);
+            position: relative;
+            transform: rotate(0.5deg);
+        }
+        
+        .content-block h3 {
+            margin-top: 0;
+            color: var(--secondary);
+            font-size: 1.8rem;
+        }
+        
+        .icon {
+            font-size: 2.5rem;
+            margin-right: 10px;
+            display: inline-block;
+            transform: rotate(10deg);
+        }
+        
+        ul {
+            list-style-type: none;
+            padding-left: 20px;
+        }
+        
+        ul li {
+            margin-bottom: 15px;
+            position: relative;
+            padding-left: 35px;
+        }
+        
+        ul li::before {
+            content: "✏️";
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-size: 1.4rem;
+        }
+        
+        .architecture {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 30px 0;
+        }
+        
+        .architecture img {
+            max-width: 100%;
+            border: 1px dashed #aaa;
+            border-radius: 8px;
+            padding: 10px;
+            background-color: white;
+        }
+        
+        .feature-card {
+            background: white;
+            border: 3px solid var(--dark);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 5px 5px 0 var(--primary);
+            transform: rotate(-1deg);
+        }
+        
+        .feature-card h3 {
+            color: var(--primary);
+            font-size: 1.6rem;
+            margin-top: 0;
+        }
+        
+        .piano-keys {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        
+        .key {
+            width: 50px;
+            height: 200px;
+            background: white;
+            border: 2px solid #333;
+            margin: 0 1px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 10px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            position: relative;
+        }
+        
+        .key.black {
+            width: 30px;
+            height: 120px;
+            background: #333;
+            color: white;
+            z-index: 2;
+            margin: 0 -15px;
+        }
+        
+        .highlight {
+            background-color: rgba(243, 156, 18, 0.2);
+            padding: 3px 8px;
+            border-radius: 5px;
+            display: inline-block;
+            transform: rotate(-1deg);
+        }
+        
+        .hand-drawn-line {
+            height: 4px;
+            background-image: linear-gradient(to right, transparent 0%, transparent 10%, var(--primary) 10%, var(--primary) 90%, transparent 90%, transparent 100%);
+            background-size: 30px 100%;
+            margin: 20px 0;
+        }
+        
+        .quote {
+            font-style: italic;
+            font-size: 1.4rem;
+            text-align: center;
+            padding: 20px;
+            border-left: 5px solid var(--accent);
+            margin: 30px 0;
+            background: rgba(243, 156, 18, 0.1);
+            transform: rotate(1deg);
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.2rem;
+            color: var(--dark);
+            margin-top: 30px;
+        }
+        
+        .sticker {
+            position: absolute;
+            font-size: 1.5rem;
+            transform: rotate(15deg);
+            padding: 5px 10px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+        
+        .sticker-1 {
+            top: -25px;
+            right: 50px;
+        }
+        
+        .sticker-2 {
+            top: 20px;
+            left: -25px;
+        }
+        
+        .sticker-3 {
+            bottom: -25px;
+            left: 50px;
+        }
+        
+        .sticker-4 {
+            bottom: 30px;
+            right: -25px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Cover Page -->
+        <div class="slide">
+            <div class="sticker sticker-1">✨</div>
+            <div class="sticker sticker-2">🏆</div>
+            <h1 class="handwritten">Hersolidity Demo Day</h1>
+            <div style="text-align: center; margin: 50px 0;">
+                <h2 style="font-size: 4rem; color: var(--primary);">FTW Project Showcase</h2>
+                <p style="font-size: 1.5rem; margin-top: 20px;">For The Win · To Achieve Victory</p>
+                <p style="font-size: 1.2rem; margin-top: 10px;">On-chain Challenge Camp System · Deposit Incentive Mechanism · Transparent & Verifiable</p>
+            </div>
+            
+            <div class="piano-keys">
+                <div class="key">F</div>
+                <div class="key black">T</div>
+                <div class="key">W</div>
+                <div class="key black">3</div>
+                <div class="key">F</div>
+                <div class="key">T</div>
+                <div class="key black">W</div>
+            </div>
+            
+            <div class="quote">
+                "Using deposit incentives and on-chain verification to help users overcome procrastination and achieve goals"
+            </div>
+        </div>
+        
+        <!-- Technical Implementation & Engineering Integrity -->
+        <div class="slide">
+            <div class="sticker sticker-3">🔧</div>
+            <h2>Technical Implementation & Engineering Integrity</h2>
+            
+            <div class="section-title">1.5 points - Clear Architecture & Rigorous Logic & Successful Deployment</div>
+            
+            <div class="content-grid">
+                <div class="content-block">
+                    <h3>🏗️ Technology Stack</h3>
+                    <ul>
+                        <li><span class="highlight">Blockchain</span>: Ethereum (Hardhat local/Goerli/Sepolia)</li>
+                        <li><span class="highlight">Smart Contracts</span>: Solidity 0.8.19 + Hardhat</li>
+                        <li><span class="highlight">Backend</span>: Node.js + Express + SQLite</li>
+                        <li><span class="highlight">Frontend</span>: React + Ethers.js</li>
+                    </ul>
+                    
+                    <h3>🔒 Security Design</h3>
+                    <ul>
+                        <li>Proxy pattern for upgradable contracts</li>
+                        <li>Password double hashing (SHA256 + Keccak256)</li>
+                        <li>Permission controls and state machine validation</li>
+                        <li>Funds secured in smart contracts</li>
+                    </ul>
+                </div>
+                
+                <div class="content-block">
+                    <h3>📂 Project Structure</h3>
+                    <ul>
+                        <li><span class="highlight">4 Core Contracts</span>: Factory, Proxy, Implementation, Storage</li>
+                        <li><span class="highlight">5 Database Tables</span>: Camps, Participants, Challenges, etc.</li>
+                        <li><span class="highlight">7 Frontend Pages</span>: Home, Camp Overview, Details, etc.</li>
+                        <li><span class="highlight">15 API Endpoints</span>: Camp management, Web3 interactions</li>
+                    </ul>
+                    
+                    <h3>🚀 Deployment Status</h3>
+                    <ul>
+                        <li>Successfully deployed on Hardhat local network</li>
+                        <li>Testnet deployments verified (Goerli/Sepolia)</li>
+                        <li>Full integration between frontend and backend</li>
+                        <li>End-to-end process testing completed</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="architecture">
+                <div style="background: white; padding: 20px; border-radius: 8px; border: 2px solid var(--dark);">
+                    <h3 style="text-align: center; color: var(--secondary);">System Architecture</h3>
+                    <pre style="font-family: monospace; font-size: 1rem;">
+        ┌─────────────┐       ┌─────────────┐       ┌─────────────┐
+        │   Frontend  │──────▶│   Backend   │──────▶│  Contracts  │
+        │   (React)   │◀──────│ (Node/Express)│◀──────│ (Solidity)  │
+        └─────────────┘       └─────────────┘       └─────────────┘
+               │                       │                    │
+               │                       │                    │
+               ▼                       ▼                    ▼
+        ┌─────────────┐       ┌─────────────┐       ┌─────────────┐
+        │  User Int.  │       │ Data Caching│       │ Fund Escrow │
+        │ Wallet Conn.│       │ Event Listen│       │ State Mgmt.│
+        └─────────────┘       └─────────────┘       └─────────────┘
+                    </pre>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Innovation & Challenge Level -->
+        <div class="slide">
+            <div class="sticker sticker-2">🚀</div>
+            <h2>Innovation & Challenge Level</h2>
+            
+            <div class="section-title">4.0 points - Real Problem Solving & Unique Solution & Technical Challenges</div>
+            
+            <div class="feature-card">
+                <h3>🎯 Solving Real Pain Points</h3>
+                <ul>
+                    <li><span class="highlight">Organizer pain points</span>: Unpredictable participation, low engagement, progress tracking difficulties</li>
+                    <li><span class="highlight">Participant pain points</span>: Lack of motivation, missing feedback, fund safety concerns</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card">
+                <h3>💡 Innovative Solutions</h3>
+                <ul>
+                    <li><span class="highlight">Deposit Incentive Mechanism</span>: Economic incentives boost completion rates</li>
+                    <li><span class="highlight">Dynamic Password Verification</span>: Simple/Complex modes for different security needs</li>
+                    <li><span class="highlight">Piano Keyboard UI</span>: Visual timeline showing camp progress</li>
+                    <li><span class="highlight">On-chain Achievement System</span>: Immutable proof of challenges completed</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card">
+                <h3>⚙️ Technical Challenges & Innovations</h3>
+                <ul>
+                    <li><span class="highlight">Proxy Contract Design</span>: Upgradability with Gas optimization</li>
+                    <li><span class="highlight">Password Security</span>: Double hashing + salt for protection</li>
+                    <li><span class="highlight">State Management</span>: Complex transitions (5 camp states × 5 participant states × 3 challenge states)</li>
+                    <li><span class="highlight">On/Off-chain Data Sync</span>: Real-time event listening and status updates</li>
+                </ul>
+            </div>
+            
+            <div class="quote">
+                "Combining behavioral economics commitment contracts with blockchain technology to create a new co-learning model"
+            </div>
+        </div>
+        
+        <!-- User Experience & Usability -->
+        <div class="slide">
+            <div class="sticker sticker-4">👩‍💻</div>
+            <h2>User Experience & Usability</h2>
+            
+            <div class="section-title">1.5 points - Clear Interactions & User-Friendly & Scenario Fit</div>
+            
+            <div class="content-grid">
+                <div class="content-block">
+                    <h3>🎨 Intuitive Interface</h3>
+                    <ul>
+                        <li>Piano keyboard theme across all pages</li>
+                        <li>Status color coding for different states</li>
+                        <li>Visual timeline showing camp lifecycle</li>
+                        <li>Responsive design for all device sizes</li>
+                    </ul>
+                    
+                    <h3>🧩 Core User Journeys</h3>
+                    <ol style="list-style-type: none; padding-left: 35px;">
+                        <li style="margin-bottom: 15px;">1. Organizer creates camp → Sets parameters</li>
+                        <li style="margin-bottom: 15px;">2. Participant enrolls → Pays deposit</li>
+                        <li style="margin-bottom: 15px;">3. Organizer configures challenges → Sets passwords</li>
+                        <li style="margin-bottom: 15px;">4. Participant completes challenges → Submits verification</li>
+                        <li style="margin-bottom: 15px;">5. Winners withdraw deposits → Losers forfeit funds</li>
+                    </ol>
+                </div>
+                
+                <div class="content-block">
+                    <h3>🕹️ User-Friendly Operations</h3>
+                    <ul>
+                        <li>One-click wallet connection (MetaMask, etc.)</li>
+                        <li>Real-time form validation with feedback</li>
+                        <li>Clear status change notifications</li>
+                        <li>Multi-language support (English/Chinese)</li>
+                    </ul>
+                    
+                    <h3>🔍 Scenario Fit</h3>
+                    <ul>
+                        <li>Learning community challenges</li>
+                        <li>Fitness accountability programs</li>
+                        <li>Skill development milestones</li>
+                        <li>Team collaboration targets</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="hand-drawn-line"></div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <h3>Interface Design Preview</h3>
+                <div style="display: inline-block; background: white; padding: 15px; border: 2px dashed var(--primary); border-radius: 8px; transform: rotate(2deg);">
+                    <div style="display: flex; gap: 15px;">
+                        <div style="border: 1px solid #ccc; padding: 5px; background: #f9f9f9;">
+                            <div style="width: 80px; height: 120px; background: linear-gradient(to bottom, #e74c3c, #f39c12);"></div>
+                            <p style="margin: 5px 0; text-align: center; font-size: 0.9rem;">Homepage</p>
+                        </div>
+                        <div style="border: 1px solid #ccc; padding: 5px; background: #f9f9f9;">
+                            <div style="width: 80px; height: 120px; background: linear-gradient(to bottom, #3498db, #2ecc71);"></div>
+                            <p style="margin: 5px 0; text-align: center; font-size: 0.9rem;">Camps Overview</p>
+                        </div>
+                        <div style="border: 1px solid #ccc; padding: 5px; background: #f9f9f9;">
+                            <div style="width: 80px; height: 120px; background: linear-gradient(to bottom, #9b59b6, #e74c3c);"></div>
+                            <p style="margin: 5px 0; text-align: center; font-size: 0.9rem;">Camp Details</p>
+                        </div>
+                        <div style="border: 1px solid #ccc; padding: 5px; background: #f9f9f9;">
+                            <div style="width: 80px; height: 120px; background: linear-gradient(to bottom, #f1c40f, #27ae60);"></div>
+                            <p style="margin: 5px 0; text-align: center; font-size: 0.9rem;">Challenge Page</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Demo Quality & Delivery -->
+        <div class="slide">
+            <div class="sticker sticker-1">📊</div>
+            <h2>Demo Quality & Delivery</h2>
+            
+            <div class="section-title">3.0 points - Clear Demo & Complete Documentation & Quality Delivery</div>
+            
+            <div class="content-grid">
+                <div class="content-block">
+                    <h3>🎥 Demo Plan</h3>
+                    <ul>
+                        <li>Complete user journey: Organizer + Participant perspectives</li>
+                        <li>Key scenarios: Creation, enrollment, configuration, challenge, settlement</li>
+                        <li>Technical highlights: Contract upgrade, password security, state transitions</li>
+                        <li>Multi-device experience: Desktop + Mobile</li>
+                    </ul>
+                    
+                    <h3>📝 Documentation Completeness</h3>
+                    <ul>
+                        <li>Smart Contract Design Document</li>
+                        <li>Backend Service Design Document</li>
+                        <li>Frontend Interaction Design Document</li>
+                        <li>Security Plan & Password Mechanism</li>
+                        <li>Project Introduction & User Guide</li>
+                    </ul>
+                </div>
+                
+                <div class="content-block">
+                    <h3>📦 Deliverable Quality</h3>
+                    <ul>
+                        <li>Fully functional system: Frontend + Backend + Contracts</li>
+                        <li>Comprehensive test cases: Unit + Integration testing</li>
+                        <li>Deployment scripts and configurations</li>
+                        <li>Demo environment ready</li>
+                    </ul>
+                    
+                    <h3>🚩 Future Roadmap</h3>
+                    <ul>
+                        <li>Multi-chain deployment (Polygon, BSC, etc.)</li>
+                        <li>NFT Achievement Badges</li>
+                        <li>Social sharing & challenge features</li>
+                        <li>DAO governance model exploration</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="quote">
+                "FTW is more than an application - it's an innovative mechanism to help users achieve goals through economic incentives"
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <h3>Core Value Proposition</h3>
+                <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                    <div style="background: var(--primary); color: white; padding: 10px 15px; border-radius: 20px; transform: rotate(-3deg);">Transparent & Trustless</div>
+                    <div style="background: var(--secondary); color: white; padding: 10px 15px; border-radius: 20px; transform: rotate(2deg);">Completion Incentives</div>
+                    <div style="background: var(--accent); color: white; padding: 10px 15px; border-radius: 20px; transform: rotate(-1deg);">Overcome Procrastination</div>
+                    <div style="background: var(--dark); color: white; padding: 10px 15px; border-radius: 20px; transform: rotate(4deg);">On-chain Achievements</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Closing Slide -->
+        <div class="slide">
+            <div style="text-align: center; padding: 60px 0;">
+                <h1 class="handwritten" style="font-size: 4rem; margin-bottom: 30px;">Thank You Judges!</h1>
+                <h2 style="font-size: 2.5rem; color: var(--primary);">FTW - For The Win</h2>
+                <p style="font-size: 1.8rem; margin-top: 20px;">Making every challenge a starting point for victory</p>
+                
+                <div style="margin: 50px auto; max-width: 600px;">
+                    <div class="hand-drawn-line"></div>
+                    <p style="font-size: 1.2rem;">Project URL: http://ftw.gold</p>
+                    <div class="hand-drawn-line"></div>
+                </div>
+                
+                <div style="display: flex; justify-content: center; gap: 20px; margin-top: 40px;">
+                    <div style="background: white; border: 2px solid var(--dark); border-radius: 8px; padding: 15px; transform: rotate(-3deg);">
+                        <div style="font-size: 3rem;">🏆</div>
+                        <p>Technical<br>Implementation</p>
+                    </div>
+                    <div style="background: white; border: 2px solid var(--dark); border-radius: 8px; padding: 15px; transform: rotate(2deg);">
+                        <div style="font-size: 3rem;">💡</div>
+                        <p>Innovative<br>Solution</p>
+                    </div>
+                    <div style="background: white; border: 2px solid var(--dark); border-radius: 8px; padding: 15px; transform: rotate(-1deg);">
+                        <div style="font-size: 3rem;">😊</div>
+                        <p>User<br>Experience</p>
+                    </div>
+                    <div style="background: white; border: 2px solid var(--dark); border-radius: 8px; padding: 15px; transform: rotate(4deg);">
+                        <div style="font-size: 3rem;">🎯</div>
+                        <p>Quality<br>Delivery</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            Hersolidity Demo Day Project Presentation | FTW On-chain Challenge Camp System | 2025
+        </div>
+    </div>
+</body>
+</html>
