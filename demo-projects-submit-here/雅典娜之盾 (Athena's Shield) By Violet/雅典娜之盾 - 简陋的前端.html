@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>雅典娜之盾 - Athena's Shield</title>
+    <!-- 引入Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Ethers.js -->
+    <script src="https://cdn.ethers.io/lib/ethers-5.6.umd.min.js"></script>
+    <style>
+        /* 自定义字体和一些细微样式 */
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+        
+        /* 根元素定义配色方案 */
+        :root {
+            --bg-color: #EAE9E6; /* 背景色 - 科罗拉多 */
+            --text-color: #594A69; /* 文字/Logo主色 - 深紫 */
+            --text-light-color: #7d6c91; /* 浅色文字 */
+            --accent-color: #594A69; /* 强调色 */
+            --accent-hover-color: #473a54; /* 强调色悬浮 */
+            --card-bg-color: rgba(255, 255, 255, 0.7); /* 卡片背景 */
+            --card-border-color: rgba(89, 74, 105, 0.1); /* 卡片边框 */
+            --input-bg-color: #F5F5F3; /* 输入框背景 */
+            --input-border-color: #D1D5DB; /* 输入框边框 */
+            --progress-bar-bg: #DCD9D4; /* 进度条背景 */
+        }
+
+        body {
+            font-family: 'Noto Sans SC', 'Nunito', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+        .card-style {
+            background-color: var(--card-bg-color);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border-color);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+        }
+        .main-accent-text {
+            color: var(--accent-color);
+        }
+        .progress-bar-inner {
+            background-color: var(--accent-color);
+        }
+        .title-font {
+             font-family: 'Noto Sans SC', sans-serif; /* 可以指定一个更具艺术感的标题字体 */
+             font-weight: 900;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- 导航栏 -->
+    <nav class="p-4 flex justify-between items-center card-style sticky top-0 z-10">
+        <div class="flex items-center">
+            <!-- 更新后的SVG Logo -->
+            <div class="w-10 h-10 mr-3 flex items-center justify-center">
+                <svg width="100%" height="100%" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M50 2.5L95.45 26.25V73.75L50 97.5L4.55 73.75V26.25L50 2.5Z" stroke="#594A69" stroke-width="5"/>
+                    <path d="M50 15L86.6 35V65L50 85L13.4 65V35L50 15Z" stroke="#594A69" stroke-width="3" stroke-opacity="0.5"/>
+                    <path d="M35 40L50 25L65 40V55L50 70L35 55V40Z" fill="#594A69"/>
+                </svg>
+            </div>
+            <h1 class="text-xl font-bold tracking-wider main-accent-text">雅典娜之盾</h1>
+        </div>
+        <button id="connectWalletBtn" class="bg-[var(--accent-color)] hover:bg-[var(--accent-hover-color)] text-white font-bold py-2 px-4 rounded-lg transition duration-300">
+            连接钱包
+        </button>
+    </nav>
+
+    <!-- 主体内容 -->
+    <main class="container mx-auto p-4 md:p-8">
+        
+        <!-- 头部介绍 -->
+        <header class="text-center mb-12">
+            <h2 class="text-4xl md:text-5xl font-bold mb-4 title-font">用代码作盾，以共识为光</h2>
+            <p class="text-[var(--text-light-color)] max-w-2xl mx-auto">一个由社区驱动，通过极致透明的链上流程，为社区成员提供关键资源的去中心化互助网络。</p>
+        </header>
+
+        <!-- 管理员面板 - 只有合约所有者可见 -->
+        <div id="adminPanel" class="hidden card-style p-6 rounded-2xl mb-12">
+            <h3 class="text-2xl font-bold mb-4 border-b border-[var(--card-border-color)] pb-2">魔法师的工坊 🧙</h3>
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- 创建新项目 -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-2 main-accent-text">铸造新的守护契约</h4>
+                    <input id="beneficiary" type="text" placeholder="受益人地址" class="w-full bg-[var(--input-bg-color)] p-2 rounded mb-2 border border-[var(--input-border-color)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)] text-[var(--text-color)]">
+                    <input id="fundingGoal" type="number" placeholder="募款目标 (USDC)" class="w-full bg-[var(--input-bg-color)] p-2 rounded mb-2 border border-[var(--input-border-color)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)] text-[var(--text-color)]">
+                    <button id="createCampaignBtn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
+                        发起契约
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 项目列表 -->
+        <div>
+            <h3 class="text-3xl font-bold mb-8 text-center title-font">守护中的契约</h3>
+            <div id="campaignsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- 动态加载的项目卡片将插入这里 -->
+                <div id="loadingIndicator" class="text-center col-span-full">
+                    <p>正在从星界网络读取契约...</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+    
+    <!-- 消息提示框 -->
+    <div id="toast" class="hidden fixed bottom-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg">
+      <p id="toastMessage"></p>
+    </div>
+
+
+<script>
+// --- 配置和常量 ---
+
+// !!重要!! 部署合约后，请用你的合约地址替换这里的地址
+const CAMPAIGN_FACTORY_ADDRESS = "YOUR_CAMPAIGN_FACTORY_ADDRESS_HERE"; 
+const USDC_TOKEN_ADDRESS = "YOUR_USDC_TESTNET_ADDRESS_HERE"; // 例如 Sepolia测试网上的USDC地址
+
+// 合约的ABI (应用二进制接口) - 这是编译器生成的JSON，告诉前端如何与合约交互
+// 你需要从Remix中编译后的文件中复制这些ABI
+const CAMPAIGN_FACTORY_ABI = [
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "campaignAddress",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "beneficiary",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "goal",
+				"type": "uint256"
+			}
+		],
+		"name": "CampaignCreated",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_beneficiary",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_fundingGoal",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "_tokenAddress",
+				"type": "address"
+			}
+		],
+		"name": "createCampaign",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getDeployedCampaigns",
+		"outputs": [
+			{
+				"internalType": "address[]",
+				"name": "",
+				"type": "address[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+const CAMPAIGN_ABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_beneficiary",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_fundingGoal",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "_tokenAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_manager",
+				"type": "address"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "donor",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "Donated",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "milestoneId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "description",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "MilestoneCreated",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "milestoneId",
+				"type": "uint256"
+			}
+		],
+		"name": "MilestoneReleased",
+		"type": "event"
+	},
+	{
+		"inputs": [],
+		"name": "beneficiary",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "contributions",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_description",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_amount",
+				"type": "uint256"
+			}
+		],
+		"name": "createMilestone",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_amount",
+				"type": "uint256"
+			}
+		],
+		"name": "donate",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "fundingGoal",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getBalance",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "manager",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "milestones",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "description",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bool",
+				"name": "released",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_milestoneId",
+				"type": "uint256"
+			}
+		],
+		"name": "releaseMilestoneFunds",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "token",
+		"outputs": [
+			{
+				"internalType": "contract IERC20",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "totalRaised",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+const ERC20_ABI = [
+  "function approve(address spender, uint256 amount) external returns (bool)",
+  "function allowance(address owner, address spender) external view returns (uint256)"
+];
+
+
+// --- 全局变量 ---
+let provider;
+let signer;
+let userAddress;
+let factoryContract;
+
+// --- DOM元素 ---
+const connectWalletBtn = document.getElementById('connectWalletBtn');
+const adminPanel = document.getElementById('adminPanel');
+const createCampaignBtn = document.getElementById('createCampaignBtn');
+const campaignsContainer = document.getElementById('campaignsContainer');
+const loadingIndicator = document.getElementById('loadingIndicator');
+
+// --- 初始化和事件监听 ---
+
+window.addEventListener('load', async () => {
+    // 检查MetaMask是否存在
+    if (window.ethereum) {
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        
+        // 监听账户变化
+        window.ethereum.on('accountsChanged', (accounts) => {
+            if (accounts.length > 0) {
+                handleWalletConnected(accounts[0]);
+            } else {
+                handleWalletDisconnected();
+            }
+        });
+
+        // 初始化工厂合约实例，即使未连接钱包也可以读取数据
+        factoryContract = new ethers.Contract(CAMPAIGN_FACTORY_ADDRESS, CAMPAIGN_FACTORY_ABI, provider);
+        loadCampaigns();
+    } else {
+        showToast("请安装MetaMask钱包!", "error");
+        loadingIndicator.textContent = '请安装MetaMask钱包以浏览项目。';
+    }
+
+    connectWalletBtn.addEventListener('click', connectWallet);
+    createCampaignBtn.addEventListener('click', createCampaign);
+});
+
+
+// ---核心函数 ---
+
+/**
+ * 连接用户的MetaMask钱包
+ */
+async function connectWallet() {
+    try {
+        const accounts = await provider.send("eth_requestAccounts", []);
+        handleWalletConnected(accounts[0]);
+    } catch (error) {
+        console.error("连接钱包失败:", error);
+        showToast("连接钱包失败", "error");
+    }
+}
+
+/**
+ * 处理钱包连接成功的逻辑
+ */
+async function handleWalletConnected(account) {
+    userAddress = account;
+    signer = provider.getSigner();
+    
+    // 更新UI
+    connectWalletBtn.textContent = `${userAddress.substring(0, 6)}...${userAddress.substring(userAddress.length - 4)}`;
+    showToast("钱包连接成功！");
+
+    // 检查用户是否是合约所有者，以显示管理员面板
+    checkAdminStatus();
+}
+
+/**
+ * 处理钱包断开连接的逻辑
+ */
+function handleWalletDisconnected() {
+    userAddress = null;
+    signer = null;
+    connectWalletBtn.textContent = '连接钱包';
+    adminPanel.classList.add('hidden');
+    showToast("钱包已断开连接", "info");
+}
+
+
+/**
+ * 检查用户是否是工厂合约的所有者
+ */
+async function checkAdminStatus() {
+    if(!userAddress) return;
+    try {
+        const owner = await factoryContract.owner();
+        if (userAddress.toLowerCase() === owner.toLowerCase()) {
+            adminPanel.classList.remove('hidden');
+        } else {
+            adminPanel.classList.add('hidden');
+        }
+    } catch(e) {
+        console.error("检查管理员状态失败", e);
+    }
+}
+
+/**
+ * 从工厂合约加载所有已部署的募款项目
+ */
+async function loadCampaigns() {
+    loadingIndicator.style.display = 'block';
+    try {
+        const campaignAddresses = await factoryContract.getDeployedCampaigns();
+        campaignsContainer.innerHTML = ''; // 清空现有内容
+
+        if(campaignAddresses.length === 0){
+             loadingIndicator.textContent = '暂无进行中的契约，快让魔法师创建一个吧！';
+             campaignsContainer.appendChild(loadingIndicator);
+             return;
+        }
+
+        for (const address of campaignAddresses.reverse()) { //反转数组，让最新的项目显示在最前面
+            const campaignContract = new ethers.Contract(address, CAMPAIGN_ABI, provider);
+            const beneficiary = await campaignContract.beneficiary();
+            const fundingGoal = await campaignContract.fundingGoal();
+            const totalRaised = await campaignContract.totalRaised();
+            
+            // 假设USDC是6位小数
+            const goalInUSDC = ethers.utils.formatUnits(fundingGoal, 6);
+            const raisedInUSDC = ethers.utils.formatUnits(totalRaised, 6);
+            
+            createCampaignCard(address, beneficiary, goalInUSDC, raisedInUSDC);
+        }
+         loadingIndicator.style.display = 'none';
+
+    } catch (error) {
+        console.error("加载项目失败:", error);
+        showToast("加载项目失败", "error");
+        loadingIndicator.textContent = '加载契约失败，请检查合约地址是否正确。';
+    }
+}
+
+
+/**
+ * 创建新项目 (管理员功能)
+ */
+async function createCampaign() {
+    const beneficiary = document.getElementById('beneficiary').value;
+    const fundingGoal = document.getElementById('fundingGoal').value;
+
+    if (!ethers.utils.isAddress(beneficiary)) {
+        showToast("请输入有效的受益人地址", "error");
+        return;
+    }
+    if (!fundingGoal || parseFloat(fundingGoal) <= 0) {
+        showToast("请输入有效的募款目标", "error");
+        return;
+    }
+    
+    if (!signer) {
+        showToast("请先连接钱包", "error");
+        return;
+    }
+
+    createCampaignBtn.disabled = true;
+    createCampaignBtn.textContent = '发起中...';
+
+    try {
+        const factoryWithSigner = factoryContract.connect(signer);
+        const goalInWei = ethers.utils.parseUnits(fundingGoal, 6);
+        
+        const tx = await factoryWithSigner.createCampaign(beneficiary, goalInWei, USDC_TOKEN_ADDRESS);
+        showToast("正在发起契约...请等待交易确认", "info");
+        await tx.wait(); 
+        
+        showToast("契约发起成功!", "success");
+        loadCampaigns(); 
+    } catch (error) {
+        console.error("发起契约失败:", error);
+        showToast("发起契约失败", "error");
+    } finally {
+        createCampaignBtn.disabled = false;
+        createCampaignBtn.textContent = '发起契约';
+    }
+}
+
+
+/**
+ * 为项目捐款
+ */
+async function donate(campaignAddress, amount, buttonElement) {
+    if (!signer) {
+        showToast("请先连接钱包", "error");
+        return;
+    }
+
+    buttonElement.disabled = true;
+    buttonElement.textContent = '注入中...';
+
+    try {
+        const usdcContract = new ethers.Contract(USDC_TOKEN_ADDRESS, ERC20_ABI, signer);
+        const amountInWei = ethers.utils.parseUnits(amount, 6);
+
+        showToast("正在请求授权...", "info");
+        const approveTx = await usdcContract.approve(campaignAddress, amountInWei);
+        await approveTx.wait();
+        showToast("授权成功！正在注入能量...", "info");
+
+        const campaignContract = new ethers.Contract(campaignAddress, CAMPAIGN_ABI, signer);
+        const donateTx = await campaignContract.donate(amountInWei);
+        await donateTx.wait();
+        
+        showToast("能量注入成功！感谢您的守护！", "success");
+        loadCampaigns(); // 刷新项目数据
+
+    } catch (error) {
+        console.error("注入能量失败:", error);
+        showToast("注入能量失败", "error");
+    } finally {
+        buttonElement.disabled = false;
+        buttonElement.textContent = '注入能量！✨';
+    }
+}
+
+
+// --- UI 辅助函数 ---
+
+/**
+ * 动态创建项目卡片并添加到页面
+ */
+function createCampaignCard(address, beneficiary, goal, raised) {
+    const percentage = parseFloat(goal) > 0 ? (parseFloat(raised) / parseFloat(goal) * 100).toFixed(2) : 0;
+
+    const cardHTML = `
+        <div class="card-style p-6 rounded-2xl flex flex-col justify-between transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+            <div>
+                <p class="text-xs text-[var(--text-light-color)] break-all mb-2">契约地址: ${address}</p>
+                <h4 class="text-xl font-bold mb-2 break-words">守护对象: ${beneficiary.substring(0,8)}...</h4>
+                <div class="my-4">
+                    <div class="flex justify-between items-center mb-1 text-sm">
+                        <span class="main-accent-text font-semibold">${parseFloat(raised).toLocaleString()} USDC</span>
+                        <span class="text-[var(--text-light-color)]">目标: ${parseFloat(goal).toLocaleString()} USDC</span>
+                    </div>
+                    <div class="w-full bg-[var(--progress-bar-bg)] rounded-full h-2.5">
+                        <div class="progress-bar-inner h-2.5 rounded-full" style="width: ${percentage > 100 ? 100 : percentage}%"></div>
+                    </div>
+                     <p class="text-right text-sm mt-1 text-[var(--text-light-color)]">${percentage}%</p>
+                </div>
+            </div>
+            <div class="mt-4">
+                <input type="number" id="donate-amount-${address}" class="w-full bg-[var(--input-bg-color)] p-2 rounded mb-2 border border-[var(--input-border-color)] text-[var(--text-color)]" placeholder="输入能量值 (USDC)">
+                <button onclick="handleDonate('${address}')" class="w-full bg-[var(--accent-color)] hover:bg-[var(--accent-hover-color)] text-white font-bold py-2 px-4 rounded-lg transition duration-300">
+                    注入能量！✨
+                </button>
+            </div>
+        </div>
+    `;
+    campaignsContainer.insertAdjacentHTML('beforeend', cardHTML);
+}
+
+// 由于onclick不能直接传递复杂参数，用一个辅助函数来处理
+function handleDonate(address) {
+    const amountInput = document.getElementById(`donate-amount-${address}`);
+    const button = amountInput.nextElementSibling;
+    const amount = amountInput.value;
+    if (amount && parseFloat(amount) > 0) {
+        donate(address, amount, button);
+    } else {
+        showToast("请输入有效的能量值", "error");
+    }
+}
+
+
+/**
+ * 显示一个短暂的消息提示
+ */
+function showToast(message, type = "success") {
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toastMessage');
+
+    toastMessage.textContent = message;
+    
+    // 根据类型改变颜色
+    toast.classList.remove('bg-green-500', 'bg-red-500', 'bg-blue-500', 'bg-slate-700');
+    if (type === 'success') {
+        toast.classList.add('bg-green-500');
+    } else if (type === 'error') {
+        toast.classList.add('bg-red-500');
+    } else { // info
+        toast.classList.add('bg-blue-500');
+    }
+
+    toast.classList.remove('hidden');
+    setTimeout(() => {
+        toast.classList.add('hidden');
+    }, 4000); // 4秒后自动消失
+}
+
+</script>
+</body>
+</html>
